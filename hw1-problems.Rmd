@@ -74,7 +74,7 @@ colnames(pop)[1] <- "country"
 colnames(u5Mort)[1] <- "country"
 colnames(gdp)[1] <- "country"
 colnames(life_exp)[1] <- "country"
-colnames(fertile)[1] <- "Country"
+colnames(fertile)[1] <- "country"
 ```
 
 ## Problem 1.4 
@@ -83,18 +83,28 @@ Notice that in these tables, years are represented by columns. We want to create
 
 ```{r}
 # Your code goes here.
+head(pop)
+head(u5Mort)
+head(gdp)
+head(life_exp)
+head(fertile)
 ```
 
 We call this the _long_ format. Use the `gather` function from the `tidyr` package to create a new table for childhood mortality using the long format. Call the new columns `year` and `child_mortality`
 
 ```{r}
 # Your code goes here.
+u5Mort <- u5Mort %>% gather(year, child_mortality, -country)
 ```
 
 Now redefine the remaining tables in this way.
 
 ```{r}
 # Your code goes here.
+pop <- pop %>% gather(year, population, -country)
+gdp <- gdp %>% gather(year, gdp, -country)
+life_exp <- life_exp %>% gather(year, life_exp, -country)
+fertile <- fertile %>% gather(year, fertility, -country)
 ```
 
 
@@ -104,6 +114,7 @@ Now we want to join all these files together. Make one consolidated table contai
 
 ```{r}
 # Your code goes here.
+
 ```
 
 ## Problem 1.6

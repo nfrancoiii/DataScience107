@@ -1,0 +1,18 @@
+{
+    "contents" : "\n## We set variables using \"<-\"\ntab <- read.csv(\"city_graduation_and_expenditures.csv\")\n\n## Plots from the \"tab\" table the $Expenditures details against the \n## $Graduatio detais\n\nplot( tab$Expenditures, tab$Graduation)\n\n\n",
+    "created" : 1453863882798.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "4270480252",
+    "id" : "E12A1F95",
+    "lastKnownWriteTime" : 1453864382,
+    "path" : "~/Google Drive/COLLEGE WORK/Harvard Extension School/DataScience107/cityEducationExpenditures.R",
+    "project_path" : "cityEducationExpenditures.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "type" : "r_source"
+}

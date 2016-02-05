@@ -1,0 +1,25 @@
+{
+    "contents" : "",
+    "created" : 1453864143259.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "6A3A1A0A",
+    "lastKnownWriteTime" : 37446471691141251,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "gbpf5gljv4",
+        "caption" : "tab",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=tab&cache_key=gbpf5gljv4",
+        "displayedObservations" : 50,
+        "environment" : "",
+        "object" : "tab",
+        "totalObservations" : 50,
+        "variables" : 5
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "type" : "r_dataframe"
+}

@@ -1,0 +1,19 @@
+---
+title: "Example_jan_27_2016"
+author: "Nicholas Franco III"
+date: "January 28, 2016"
+output: html_document
+---
+
+<!-- I can comment using html syntax in R Markdown -->
+# First Chapter 
+
+This is an exampe of R markdown
+
+Here is the answer to your first question:
+
+<!-- shortcut to add the r code (command + option + i) -->
+```{r}
+  plot(co2, col=2)
+```
+

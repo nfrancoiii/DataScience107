@@ -21,6 +21,12 @@ The assignment uses data to answer specific question about global health and eco
 
 Most people get them wrong. Why is this? In part it is due to our preconceived notion that the world is divided into two groups: the
 _Western world_ versus the _third world_, characterized by "long life,small family" and "short life, large family" respectively. In this homework we will use data visualization to gain insights on this topic.  
+```{r, include = FALSE}
+#Include libraries and hide this from the reader
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+```
 
 
 # Problem 1
@@ -52,10 +58,14 @@ fertile <- read.csv("indicator undata total_fertility - Data.csv")
  Write a function called `my_func` that takes a table as an argument and returns the column name. For each of the five tables, what is the name of the column containing the country names? Print out the tables or look at them with `View` to determine the column.
 
 ```{r}
-# Your code goes here.
 my_func <- function(x){
   return(names(x))
 }
+my_func(pop)
+my_func(u5Mort)
+my_func(gdp)
+my_func(life_exp)
+my_func(fertile)
 ```
 The column containing the country name in each data set is as follows:
   "Total.population" in the population data set;
@@ -69,7 +79,6 @@ The column containing the country name in each data set is as follows:
 In the previous problem we noted that gapminder is inconsistent in naming their country column. Fix this by assigning a common name to this column in the various tables.
 
 ```{r}
-# Your code goes here.
 colnames(pop)[1] <- "country"
 colnames(u5Mort)[1] <- "country"
 colnames(gdp)[1] <- "country"
@@ -82,7 +91,6 @@ colnames(fertile)[1] <- "country"
 Notice that in these tables, years are represented by columns. We want to create a tidy dataset in which each row is a unit or observation and our 5 values of interest, including the year for that unit, are in the columns. The unit here is a country/year pair and each unit gets values:
 
 ```{r}
-# Your code goes here.
 head(pop)
 head(u5Mort)
 head(gdp)
@@ -93,14 +101,12 @@ head(fertile)
 We call this the _long_ format. Use the `gather` function from the `tidyr` package to create a new table for childhood mortality using the long format. Call the new columns `year` and `child_mortality`
 
 ```{r}
-# Your code goes here.
 u5Mort <- u5Mort %>% gather(year, child_mortality, -country)
 ```
 
 Now redefine the remaining tables in this way.
 
 ```{r}
-# Your code goes here.
 pop <- pop %>% gather(year, population, -country)
 gdp <- gdp %>% gather(year, gdp, -country)
 life_exp <- life_exp %>% gather(year, life_exp, -country)
@@ -113,8 +119,11 @@ fertile <- fertile %>% gather(year, fertility, -country)
 Now we want to join all these files together. Make one consolidated table containing all the columns
 
 ```{r}
-# Your code goes here.
-
+joinBy <- c("country", "year")
+master <- full_join(u5Mort, gdp, by = joinBy)
+master <- full_join(master, pop, by = joinBy)
+master <- full_join(master, fertile, by = joinBy)
+master <- full_join(master, life_exp, by = joinBy)
 ```
 
 ## Problem 1.6
@@ -123,6 +132,14 @@ Add a column to the consolidated table containing the continent for each country
 
 ```{r}
 # Your code goes here.
+continents <- read.table("continent-info.tsv", sep = "\t")
+names(continents) <- c("country", "continent")
+master <- left_join(master, continents)
+#Clean the Data
+master$year <- gsub("X", "", master$year)
+master$year <- as.numeric(master$year)
+master$pop <- gsub(",", "", master$pop)
+master$pop <- as.numeric(as.character(master$pop))
 ```
 
 # Problem 2 
@@ -136,7 +153,22 @@ Report the child mortalilty rate in 2015 for these 5 pairs:
 5. Thailand or South Africa
 
 ```{r}
-# Your code goes here.
+#1. Sri Lanka or Turkey
+subset(master$child_mortality, master$country == "Sri Lanka" & master$year == 2015)
+subset(master$child_mortality, master$country == "Turkey" & master$year == 2015)
+#2. Poland or South Korea
+subset(master$child_mortality, master$country == "Poland" & master$year == 2015)
+subset(master$child_mortality, master$country == "South Korea" & master$year == 2015)
+#3. Malaysia or Russia
+subset(master$child_mortality, master$country == "Malaysia" & master$year == 2015)
+subset(master$child_mortality, master$country == "Russia" & master$year == 2015)
+#4. Pakistan or Vietnam
+subset(master$child_mortality, master$country == "Pakistan" & master$year == 2015)
+subset(master$child_mortality, master$country == "Vietnam" & master$year == 2015)
+#5. Thailand or South Africa
+subset(master$child_mortality, master$country == "Thailand" & master$year == 2015)
+subset(master$child_mortality, master$country == "South Africa" & master$year == 2015)
+
 ```
 
 # Problem 3
@@ -148,10 +180,16 @@ To examine if in fact there was a long-life-in-a-small-family and short-life-in-
 Use `ggplot2` to create a plot of life expectancy versus fertiltiy for 1962 for Africa, Asia, Europe, and the Americas. Use color to denote continent and point size to denote population size:
 
 ```{r}
-# Your code goes here.
+p <- ggplot(filter(master, year == 1962), aes(x=fertility, y = life_exp))
+p + geom_point(aes(size = pop, color=continent)) +
+  ggtitle("Life Expectancy and Fertility Rates") +
+  labs(x="Fertility Rate", y = "Life Expectancy at Birth")
+
 ```
 
 Do you see a dichotomy? Explain.
+
+There does appear to be a dicotomy as the bottom lest quadrant of the graph is largely empty. This suggests that there may be distinct patterns in life expectancy going on at different fertility rates. We also notice that the points are clustered by continent.
 
 ## Problem 3.2
 
@@ -160,7 +198,14 @@ Now we will annotate the plot to show different types of countries.
 Learn about OECD and OPEC. Add a couple of columns to your consolidated tables containing a logical vector that tells if a country is OECD and OPEC respectively. It is ok to base membership on 2015.
 
 ```{r}
-# Your code goes here.
+# OECD Countries
+oecd <- read.csv("OECD.csv")
+#OPEC Countries
+opec <- read.csv("OPEC.csv")
+#Merge OPEC and OECD with Master
+master <- left_join(master, oecd)
+master <- left_join(master, opec)
+
 ```
 
 ### Problem 3.3

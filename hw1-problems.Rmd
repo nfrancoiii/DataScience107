@@ -185,7 +185,7 @@ To examine if in fact there was a long-life-in-a-small-family and short-life-in-
 Use `ggplot2` to create a plot of life expectancy versus fertiltiy for 1962 for Africa, Asia, Europe, and the Americas. Use color to denote continent and point size to denote population size:
 
 ```{r}
-p <- ggplot(filter(master, year == 1962), aes(x=fertility, y = life_exp))
+p <- ggplot(filter(master, year == 1962, continent == c("Africa", "Asia", "Europe", "Americas")), aes(x=fertility, y = life_exp))
 p + geom_point(aes(size = pop, color=continent)) +
   ggtitle("Life Expectancy and Fertility Rates") +
   labs(x="Fertility Rate", y = "Life Expectancy at Birth")
@@ -194,7 +194,7 @@ p + geom_point(aes(size = pop, color=continent)) +
 
 Do you see a dichotomy? Explain.
 
-There does appear to be a dicotomy as the bottom lest quadrant of the graph is largely empty. This suggests that there may be distinct patterns in life expectancy going on at different fertility rates. We also notice that the points are clustered by continent.
+There does appear to be a dicotomy as the bottom lest quadrant of the graph is largely empty. This suggests that there may be distinct patterns in life expectancy going on at different fertility rates. We also notice that the points are clustered by continent. Europe is clearly clustered near the top left portion of the graph with low fertility rates and high life expectancy, while Africa is clustered near the bottom left with high fertility rates and low life expectancy.
 
 ## Problem 3.2
 

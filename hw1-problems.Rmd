@@ -5,6 +5,9 @@ output: html_document
 ---
  
 **This homework is due Sunday February 14, 2016 at 11:59 PM. When complete, submit your code in the R Markdown file and the knitted HTML file on Canvas.**
+```{r global_options, warning=FALSE, message=FALSE}
+
+```
 
 
 # Background
@@ -21,7 +24,7 @@ The assignment uses data to answer specific question about global health and eco
 
 Most people get them wrong. Why is this? In part it is due to our preconceived notion that the world is divided into two groups: the
 _Western world_ versus the _third world_, characterized by "long life,small family" and "short life, large family" respectively. In this homework we will use data visualization to gain insights on this topic.  
-```{r, include = FALSE}
+```{r, include = FALSE, }
 #Include libraries and hide this from the reader
 library(dplyr)
 library(tidyr)
@@ -44,7 +47,7 @@ We will use the following datasets:
 5.     [Total GDP](http://spreadsheets.google.com/pub?key=pyj6tScZqmEfI4sLVvEQtHw&output=csv)
 
 Create five `tbl_df` table objects, one for each of the tables provided in the above files. Hints: Use the `read_csv` function. Because these are only temporary files, give them short names.
-```{r,include=FALSE}
+```{r, warning = FALSE}
 pop <- read.csv("indicator gapminder population - Data.csv")
 u5Mort <- read.csv("indicator gapminder under5mortality - Data.csv")
 gdp <- read.csv("indicator GDP at market prices, constant 2000 US$ (WB estimates) .xls - Data.csv")
@@ -57,7 +60,7 @@ fertile <- read.csv("indicator undata total_fertility - Data.csv")
 
  Write a function called `my_func` that takes a table as an argument and returns the column name. For each of the five tables, what is the name of the column containing the country names? Print out the tables or look at them with `View` to determine the column.
 
-```{r}
+```{r, warning = FALSE}
 my_func <- function(x){
   return(names(x))
 }
@@ -78,7 +81,7 @@ The column containing the country name in each data set is as follows:
 
 In the previous problem we noted that gapminder is inconsistent in naming their country column. Fix this by assigning a common name to this column in the various tables.
 
-```{r}
+```{r, warning = FALSE}
 colnames(pop)[1] <- "country"
 colnames(u5Mort)[1] <- "country"
 colnames(gdp)[1] <- "country"
@@ -118,7 +121,7 @@ fertile <- fertile %>% gather(year, fertility, -country)
 
 Now we want to join all these files together. Make one consolidated table containing all the columns
 
-```{r}
+```{r, warning=FALSE}
 joinBy <- c("country", "year")
 master <- full_join(u5Mort, gdp, by = joinBy)
 master <- full_join(master, pop, by = joinBy)
@@ -132,8 +135,10 @@ Add a column to the consolidated table containing the continent for each country
 
 ```{r}
 # Your code goes here.
-continents <- read.table("continent-info.tsv", sep = "\t")
+continents <- read.table("continent-info.tsv", sep = "\t", quote="\"")
 names(continents) <- c("country", "continent")
+#Clean continents data
+continents$continent <- trimws(continents$continent)
 master <- left_join(master, continents)
 #Clean the Data
 master$year <- gsub("X", "", master$year)

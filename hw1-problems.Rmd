@@ -185,7 +185,7 @@ To examine if in fact there was a long-life-in-a-small-family and short-life-in-
 Use `ggplot2` to create a plot of life expectancy versus fertiltiy for 1962 for Africa, Asia, Europe, and the Americas. Use color to denote continent and point size to denote population size:
 
 ```{r}
-p <- ggplot(filter(master, year == 1962, continent == c("Africa", "Asia", "Europe", "Americas")), aes(x=fertility, y = life_exp))
+p <- ggplot(filter(master, year == 1962, continent != "Oceania"), aes(x=fertility, y = life_exp))
 p + geom_point(aes(size = pop, color=continent)) +
   ggtitle("Life Expectancy and Fertility Rates") +
   labs(x="Fertility Rate", y = "Life Expectancy at Birth")
@@ -218,10 +218,20 @@ master <- left_join(master, opec)
 Make the same plot as in Problem 3.1, but this time use color to annotate the OECD countries and OPEC countries. For countries that are not part of these two organization annotate if they are from Africa, Asia, or the Americas.
 
 ```{r}
-# Your code goes here.
+# Consolidate groups or continents into a singe variable called "memberOf"
+master$memberOf <- master$continent
+master$memberOf[master$opec == "opec"] <- "OPEC"
+master$memberOf[master$oecd == "oecd"] <- "OECD"
+#Plot the data
+p <- ggplot(filter(master, year == 1962, continent != "Oceania"), aes(x=fertility, y = life_exp))
+p + geom_point(aes(size = pop, color=memberOf)) +
+  ggtitle("Life Expectancy and Fertility Rates") +
+  labs(x="Fertility Rate", y = "Life Expectancy at Birth")
+
 ```
 
 How would you describe the dichotomy?
+When we graph the data explicitly identifying the OECD and OPEC countries, we can see that there is generally still a distinct dichotomy where the OECD countries are cluster in the top-left quadrant representing low fertility rates and high life expectancies, while OPEC countries see higher fertility rates, thought with perhaps slightly higher life expectancies than non-OPEC African countries. The dichotomy though is not as distinct as the purely continent-based dichotomy as there are a hand full of OECD countries intermingled with OPEC countries. Still, the two groups generally cluster together.
 
 
 ### Problem 3.4
@@ -229,10 +239,42 @@ How would you describe the dichotomy?
 Explore how this figure changes across time. Show us 4 figures that demonstrate how this figure changes through time.
 
 ```{r}
-# Your code goes here.
+# Life Expectancy and Fertility Rates 1972
+p <- ggplot(filter(master, year == 1972, continent != "Oceania"), aes(x=fertility, y = life_exp))
+p + geom_point(aes(size = pop, color=memberOf)) +
+  ggtitle("Life Expectancy and Fertility Rates") +
+  labs(x="Fertility Rate", y = "Life Expectancy at Birth")
+
+# Life Expectancy and Fertility Rates 1982
+p <- ggplot(filter(master, year == 1982, continent != "Oceania"), aes(x=fertility, y = life_exp))
+p + geom_point(aes(size = pop, color=memberOf)) +
+  ggtitle("Life Expectancy and Fertility Rates") +
+  labs(x="Fertility Rate", y = "Life Expectancy at Birth")
+
+# Life Expectancy and Fertility Rates 1992
+p <- ggplot(filter(master, year == 1992, continent != "Oceania"), aes(x=fertility, y = life_exp))
+p + geom_point(aes(size = pop, color=memberOf)) +
+  ggtitle("Life Expectancy and Fertility Rates") +
+  labs(x="Fertility Rate", y = "Life Expectancy at Birth")
+
+# Life Expectancy and Fertility Rates 2002
+p <- ggplot(filter(master, year == 2002, continent != "Oceania"), aes(x=fertility, y = life_exp))
+p + geom_point(aes(size = pop, color=memberOf)) +
+  ggtitle("Life Expectancy and Fertility Rates") +
+  labs(x="Fertility Rate", y = "Life Expectancy at Birth")
+
+# Life Expectancy and Fertility Rates 2012
+p <- ggplot(filter(master, year == 2002, continent != "Oceania"), aes(x=fertility, y = life_exp))
+p + geom_point(aes(size = pop, color=memberOf)) +
+  ggtitle("Life Expectancy and Fertility Rates") +
+  labs(x="Fertility Rate", y = "Life Expectancy at Birth")
+
 ```
 
 Would you say that the same dichotomy exists today? Explain:
+
+Over the time period from 1962-2012, the general trent of the data begins to take a more linear shape and move generally in the direction from the bottom-right quadrant to the top left quadrant, marking a shift from high fertility rates and low life expectancy to lower fertility rates and higer life expectancy. As in 1962, those countries with high fertility rates and low life expectancy continue to be generally African nations while Europe and the OECD countries remain clustered at the top. With respect to the dichotomy we saw in earlier years, it no longer appears to be the case that the slope of the approximation line is different between the OECD and the OPEC nations. However, there is a wide spread among just the OPEC nations with respect to fertility and life expectancy with some countries intermingled with OECD countries in the low-fertility, high life expectancy quandrant, and others still mired in the high-fertility, low life-expectancy quadrant.  
+
 
 ## Problem 3.5 (Optional)
 
@@ -240,6 +282,12 @@ Make an animation with the `gganimate` package.
 
 ```{r, eval=FALSE}
 # Your code goes here.
+library(gganimate)
+p <- ggplot(filter(master,  continent != "Oceania"), aes(x=fertility, y = life_exp, frame = year))
+p + geom_point(aes(size = pop, color=memberOf)) +
+  ggtitle("Life Expectancy and Fertility Rates") +
+  labs(x="Fertility Rate", y = "Life Expectancy at Birth")
+gg_animate(p)
 ```
 
 
@@ -250,15 +298,50 @@ Having time as a third dimension made it somewhat difficult to see specific coun
 Let's compare France and its former colony Tunisia. Make a plot of fertility versus year with color denoting the country. Do the same for life expecancy. How would you compare Tunisia's improvement compared to France's in the past 60 years? Hint: use `geom_line`
  
 ```{r}
-# Put your code here.
+#Plot of France and Tunisia Fertility Rates over Time
+master %>% 
+    filter(country %in% c("France", "Tunisia")) %>%
+    ggplot(aes(x = year, y = fertility, color = country)) + 
+    geom_line() +
+    ggtitle("Fertility Rates Over Time") +
+    labs(x="Year", y = "Fertility Rate")  
+    
+#Plot of France and Tunisia Life Expectancy over Time
+master %>% 
+    filter(country %in% c("France", "Tunisia")) %>%
+    ggplot(aes(x = year, y = life_exp, color = country)) + 
+    geom_line() +
+    ggtitle("Life Expectancy Over Time") +
+    labs(x="Year", y = "Life Expectancy")  
+
 ```
+
+With respect to fertile rates, France's fertility rates historicall were much lower than Tunisia's until sometime in the late 1960's or early 1970's when fertility rates in Tunisia peaked and and dropped precipitously over the course of the next 30 years until finally evening out with France over the last decade or so near 2. 
+
+France's life expectancy has always been higher than Tunisia's though perhaps with some greater variation, perhaps due to more detailed reporting. On average, France saw a higher rate of increase in its life expectancy from the beginning of the data in 1800 through just before World War I. The effect of the two world wars can be clearly seen on France's life expectancy curve over time. Tunisia begins to dramatically improve its life expectancy beginning perhaps in the mid 1920s until flatening out over the last 15 years or so, approaching 80 and converging with France's life expectancy. 
+
 
 ## Problem 4.2
 
 Do the same, but this time compare Vietnam to the OECD countries.
 
 ```{r}
-# Put your code here.
+#Plot of Vietnam and OECD Fertility Rates over Time
+master %>% 
+    filter(country == "Vietnam" | memberOf == "OECD") %>%
+    ggplot(aes(x = year, y = fertility, color = memberOf)) + 
+    geom_line() +
+    ggtitle("Fertility Rates Over Time") +
+    labs(x="Year", y = "Fertility Rate")  
+    
+#Plot of Vietnam and OECD Life Expectancy over Time
+master %>% 
+    filter(country %in% c("France", "Tunisia")) %>%
+    ggplot(aes(x = year, y = life_exp, color = country)) + 
+    geom_line() +
+    ggtitle("Life Expectancy Over Time") +
+    labs(x="Year", y = "Life Expectancy")  
+
 ```
 
 

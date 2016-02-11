@@ -333,15 +333,28 @@ master %>%
     geom_line() +
     ggtitle("Fertility Rates Over Time") +
     labs(x="Year", y = "Fertility Rate")  
-    
+   
+master %>% 
+    filter(country == "Vietnam" | memberOf == "OECD") %>%
+    ggplot(aes(x = year, y = fertility, color = country)) + 
+    geom_line() +
+    ggtitle("Fertility Rates Over Time") +
+    labs(x="Year", y = "Fertility Rate")  
+
 #Plot of Vietnam and OECD Life Expectancy over Time
 master %>% 
-    filter(country %in% c("France", "Tunisia")) %>%
+    filter(country == "Vietnam" | memberOf == "OECD") %>%
+    ggplot(aes(x = year, y = life_exp, color = memberOf)) + 
+    geom_line() +
+    ggtitle("Life Expectancy Over Time") +
+    labs(x="Year", y = "Life Expectancy")  
+   
+master %>% 
+    filter(country == "Vietnam" | memberOf == "OECD") %>%
     ggplot(aes(x = year, y = life_exp, color = country)) + 
     geom_line() +
     ggtitle("Life Expectancy Over Time") +
     labs(x="Year", y = "Life Expectancy")  
-
 ```
 
 

@@ -60,7 +60,7 @@ fertile <- read.csv("indicator undata total_fertility - Data.csv")
 
  Write a function called `my_func` that takes a table as an argument and returns the column name. For each of the five tables, what is the name of the column containing the country names? Print out the tables or look at them with `View` to determine the column.
 
-```{r, warning = FALSE}
+```{r, warning = FALSE, results="hide"}
 my_func <- function(x){
   return(names(x))
 }
@@ -280,13 +280,13 @@ Over the time period from 1962-2012, the general trent of the data begins to tak
 
 Make an animation with the `gganimate` package.
 
-```{r, eval=FALSE}
+```{r}
 # Your code goes here.
 library(gganimate)
-p <- ggplot(filter(master,  continent != "Oceania"), aes(x=fertility, y = life_exp, frame = year))
-p + geom_point(aes(size = pop, color=memberOf)) +
+p <- ggplot(filter(master,  continent != "Oceania", year >=1950), aes(x=fertility, y = life_exp, frame = year))
+p <- p + geom_point(aes(size = pop, color=memberOf)) +
   ggtitle("Life Expectancy and Fertility Rates") +
-  labs(x="Fertility Rate", y = "Life Expectancy at Birth")
+  labs(x="Fertility Rate", y = "Life Expectancy at Birth", legend.title = "Country Membership")
 gg_animate(p)
 ```
 
@@ -332,14 +332,14 @@ master %>%
     ggplot(aes(x = year, y = fertility, color = memberOf)) + 
     geom_line() +
     ggtitle("Fertility Rates Over Time") +
-    labs(x="Year", y = "Fertility Rate")  
+    labs(x="Year", y = "Fertility Rate",color = "Country Membership")  
    
 master %>% 
     filter(country == "Vietnam" | memberOf == "OECD") %>%
     ggplot(aes(x = year, y = fertility, color = country)) + 
     geom_line() +
     ggtitle("Fertility Rates Over Time") +
-    labs(x="Year", y = "Fertility Rate")  
+    labs(x="Year", y = "Fertility Rate", color = "Country")  
 
 #Plot of Vietnam and OECD Life Expectancy over Time
 master %>% 
@@ -347,14 +347,14 @@ master %>%
     ggplot(aes(x = year, y = life_exp, color = memberOf)) + 
     geom_line() +
     ggtitle("Life Expectancy Over Time") +
-    labs(x="Year", y = "Life Expectancy")  
+    labs(x="Year", y = "Life Expectancy", color = "Country Membership") 
    
 master %>% 
     filter(country == "Vietnam" | memberOf == "OECD") %>%
     ggplot(aes(x = year, y = life_exp, color = country)) + 
     geom_line() +
     ggtitle("Life Expectancy Over Time") +
-    labs(x="Year", y = "Life Expectancy")  
+    labs(x="Year", y = "Life Expectancy", color = "Country")  
 ```
 
 
@@ -367,7 +367,20 @@ We are now going to examine GDP per capita per day.
 Create a smooth density estimate of the distribution of GDP per capita per day across countries in 1970. Include OECD, OPEC, Asia, Africa, and the Americas in the computation. When doing this we want to weigh countries with larger populations more. We can do this using the "weight"" argument in `geom_density`. 
 
 ```{r,warning=FALSE}
-# Your code goes here.
+# Create GDP per capita per day data
+master <- 
+  master %>%
+    mutate(GDPperCapitaPerDay = (gdp / pop) / 365)
+
+# GDP per Capita per Day (Density).
+master %>%
+  filter(year == 1970, continent != "Oceania") %>%
+  ggplot(aes(x = GDPperCapitaPerDay, weight = pop)) +
+  geom_density() +
+  ggtitle("GDP per Capita per Day in 1970 (Density)") +
+  labs(x = "GDP per Capita per Day ($)", y = "Population Weighted Density")
+  
+
 ```
 
 ## Problem 5.2
@@ -375,7 +388,16 @@ Create a smooth density estimate of the distribution of GDP per capita per day a
 Now do the same but show each of the five groups separately.
 
 ```{r,warning=FALSE}
-# Your code goes here.
+# GDP per Capita per Day for Member Groups
+master %>%
+  filter(year == 1970, continent != "Oceania") %>%
+  ggplot(aes(x = GDPperCapitaPerDay, weight = pop, color = memberOf)) +
+  geom_density() +
+  facet_grid(~ memberOf) +
+  ggtitle("GDP per Capita per Day in 1970 (Density)") +
+  labs(x = "GDP per Capita per Day ($)", y = "Population Weighted Density")
+
+
 ```
 
 
@@ -385,4 +407,14 @@ Visualize these densities for several years. Show a couple of of them. Summarize
 
 ```{r,warning=FALSE}
 # Put your code here.
+# GDP per Capita per Day for Member Groups
+years <- seq(1965, 2005, by = 10)
+p <- master %>%
+  filter(year >= 1950, continent != "Oceania") %>%
+  ggplot(aes(x = GDPperCapitaPerDay, weight = pop, frame = year)) +
+  geom_density() +
+  facet_grid(~year) +
+  ggtitle("GDP per Capita per Day in 1970 (Density)") +
+  labs(x = "GDP per Capita per Day ($)", y = "Population Weighted Density")
+gg_animate(p)
 ```

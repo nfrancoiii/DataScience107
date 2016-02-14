@@ -195,7 +195,9 @@ filter the rows for mammals that sleep for a total of 16 or more hours.
 ```{r}
 ## Provide your code here
 msleep %>%
-  select()
+  select(name, order, sleep_total) %>%
+  arrange(desc(sleep_total)) %>% 
+  filter(sleep_total >= 16)
 ```
 
 
@@ -226,7 +228,11 @@ total number of mammals.
 
 ```{r}
 ## Provide your code here
-
+msleep %>%
+  summarise(avg_sleep = mean(sleep_total),
+            min_sleep = min(sleep_total),
+            max_sleep = max(sleep_total),
+            total = n())
 ```
 
     
@@ -250,8 +256,8 @@ weights.
 ```{r}
 msleep %>% 
     filter(vore == "carni") %>% 
-    summarize("bodywt_sd" = mean(bodywt), 
-              "brainwt_sd" = mean(brainwt, na.rm = TRUE))
+    summarize("bodywt_mean" = mean(bodywt), 
+              "brainwt_mean" = mean(brainwt, na.rm = TRUE))
 ```
 
 We could repeat this for each factor in `vore`, which is a bit teadious.
@@ -265,8 +271,8 @@ statistics for each level in `vore`.)
 ```{r}
 msleep %>% 
     group_by(vore) %>%
-    summarize("bodywt_sd" = mean(bodywt), 
-              "brainwt_sd" = mean(brainwt, na.rm = TRUE))
+    summarize("bodywt_mean" = mean(bodywt), 
+              "brainwt_mean" = mean(brainwt, na.rm = TRUE))
 ```
 
 
@@ -279,6 +285,12 @@ in each order.
 
 ```{r}
 ## Provide your code here
+msleep %>%
+  group_by(order) %>%
+  summarise(avg_sleep = mean(sleep_total),
+            min_sleep = min(sleep_total),
+            max_sleep = max(sleep_total),
+            total = n())
 
 ```
 
@@ -379,7 +391,7 @@ What is the difference?
 
 ```{r}
 ## Provide your code here 
-
+semi_join(movies, oscars, by = "movie")
 ```
 
 
@@ -393,7 +405,7 @@ Hint: read the help file for `left_join()` or `right_join()`.
 
 ```{r}
 ## Provide your code here
-
+left_join(oscars, movies, by = "movies")
 ```
 
 Why are there NAs? 
@@ -407,7 +419,7 @@ set and all columns in both the `oscars` and `movies` columns.
 
 ```{r}
 ## Provide your code here
-
+anti_join(oscars, movies, by = "movie")
 ```
 
 
@@ -431,7 +443,7 @@ Hint: Read the help file for `anti_join()`.
 
 ```{r}
 ## Provide your code here
-
+anti_join(oscars, movies, by = "movie")
 ```
 
 

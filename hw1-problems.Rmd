@@ -5,10 +5,6 @@ output: html_document
 ---
  
 **This homework is due Sunday February 14, 2016 at 11:59 PM. When complete, submit your code in the R Markdown file and the knitted HTML file on Canvas.**
-```{r global_options, warning=FALSE, message=FALSE}
-
-```
-
 
 # Background
 
@@ -24,7 +20,7 @@ The assignment uses data to answer specific question about global health and eco
 
 Most people get them wrong. Why is this? In part it is due to our preconceived notion that the world is divided into two groups: the
 _Western world_ versus the _third world_, characterized by "long life,small family" and "short life, large family" respectively. In this homework we will use data visualization to gain insights on this topic.  
-```{r, include = FALSE, }
+```{r LoadLibraries, include = FALSE, }
 #Include libraries and hide this from the reader
 library(dplyr)
 library(tidyr)
@@ -47,7 +43,7 @@ We will use the following datasets:
 5.     [Total GDP](http://spreadsheets.google.com/pub?key=pyj6tScZqmEfI4sLVvEQtHw&output=csv)
 
 Create five `tbl_df` table objects, one for each of the tables provided in the above files. Hints: Use the `read_csv` function. Because these are only temporary files, give them short names.
-```{r, warning = FALSE}
+```{r Problem1.1, warning = FALSE}
 pop <- read.csv("indicator gapminder population - Data.csv")
 u5Mort <- read.csv("indicator gapminder under5mortality - Data.csv")
 gdp <- read.csv("indicator GDP at market prices, constant 2000 US$ (WB estimates) .xls - Data.csv")
@@ -60,7 +56,7 @@ fertile <- read.csv("indicator undata total_fertility - Data.csv")
 
  Write a function called `my_func` that takes a table as an argument and returns the column name. For each of the five tables, what is the name of the column containing the country names? Print out the tables or look at them with `View` to determine the column.
 
-```{r, warning = FALSE, results="hide"}
+```{r Problem1.2, warning = FALSE, results="hide"}
 my_func <- function(x){
   return(names(x))
 }
@@ -81,7 +77,7 @@ The column containing the country name in each data set is as follows:
 
 In the previous problem we noted that gapminder is inconsistent in naming their country column. Fix this by assigning a common name to this column in the various tables.
 
-```{r, warning = FALSE}
+```{r Problem1.3, warning = FALSE}
 colnames(pop)[1] <- "country"
 colnames(u5Mort)[1] <- "country"
 colnames(gdp)[1] <- "country"
@@ -93,7 +89,7 @@ colnames(fertile)[1] <- "country"
 
 Notice that in these tables, years are represented by columns. We want to create a tidy dataset in which each row is a unit or observation and our 5 values of interest, including the year for that unit, are in the columns. The unit here is a country/year pair and each unit gets values:
 
-```{r}
+```{r Problem1.4, results="hide"}
 head(pop)
 head(u5Mort)
 head(gdp)
@@ -109,7 +105,7 @@ u5Mort <- u5Mort %>% gather(year, child_mortality, -country)
 
 Now redefine the remaining tables in this way.
 
-```{r}
+```{r, warning=FALSE}
 pop <- pop %>% gather(year, population, -country)
 gdp <- gdp %>% gather(year, gdp, -country)
 life_exp <- life_exp %>% gather(year, life_exp, -country)
@@ -121,7 +117,7 @@ fertile <- fertile %>% gather(year, fertility, -country)
 
 Now we want to join all these files together. Make one consolidated table containing all the columns
 
-```{r, warning=FALSE}
+```{r Problem1.5, warning=FALSE}
 joinBy <- c("country", "year")
 master <- full_join(u5Mort, gdp, by = joinBy)
 master <- full_join(master, pop, by = joinBy)
@@ -133,8 +129,7 @@ master <- full_join(master, life_exp, by = joinBy)
 
 Add a column to the consolidated table containing the continent for each country. Hint: We have created a file that maps countries to continents [here](https://github.com/datasciencelabs/data/blob/master/homework_data/continent-info.tsv). Hint: Learn to use the `left_join` function.
 
-```{r}
-# Your code goes here.
+```{r Problem1.6, warning=FALSE}
 continents <- read.table("continent-info.tsv", sep = "\t", quote="\"")
 names(continents) <- c("country", "continent")
 #Clean continents data
@@ -176,6 +171,8 @@ subset(master$child_mortality, master$country == "South Africa" & master$year ==
 
 ```
 
+Based on these examples, we see that the child mortality rates in the countries that are generally considered "poorer", there is not a consistent correlation to higher child mortality rates compared to countries with higher GDPs. This suggest that the issue of child mortality is more complicated than simply being a function of a country's total wealth.
+
 # Problem 3
 
 To examine if in fact there was a long-life-in-a-small-family and short-life-in-a-large-family dichotomy,  we will visualize the average number of children per family (fertility) and the life expectancy for each country.
@@ -184,7 +181,7 @@ To examine if in fact there was a long-life-in-a-small-family and short-life-in-
 
 Use `ggplot2` to create a plot of life expectancy versus fertiltiy for 1962 for Africa, Asia, Europe, and the Americas. Use color to denote continent and point size to denote population size:
 
-```{r}
+```{r Problem3.1, warning=FALSE}
 p <- ggplot(filter(master, year == 1962, continent != "Oceania"), aes(x=fertility, y = life_exp))
 p + geom_point(aes(size = pop, color=continent)) +
   ggtitle("Life Expectancy and Fertility Rates") +
@@ -194,7 +191,7 @@ p + geom_point(aes(size = pop, color=continent)) +
 
 Do you see a dichotomy? Explain.
 
-There does appear to be a dicotomy as the bottom lest quadrant of the graph is largely empty. This suggests that there may be distinct patterns in life expectancy going on at different fertility rates. We also notice that the points are clustered by continent. Europe is clearly clustered near the top left portion of the graph with low fertility rates and high life expectancy, while Africa is clustered near the bottom left with high fertility rates and low life expectancy.
+There does appear to be a dicotomy as the bottom left quadrant of the graph is largely empty. This suggests that there may be distinct patterns in life expectancy going on at different fertility rates. We also notice that the points are clustered by continent. Europe is clearly clustered near the top left portion of the graph with low fertility rates and high life expectancy, while Africa is clustered near the bottom left with high fertility rates and low life expectancy.
 
 ## Problem 3.2
 
@@ -202,7 +199,7 @@ Now we will annotate the plot to show different types of countries.
 
 Learn about OECD and OPEC. Add a couple of columns to your consolidated tables containing a logical vector that tells if a country is OECD and OPEC respectively. It is ok to base membership on 2015.
 
-```{r}
+```{r Problem3.2, warning=FALSE}
 # OECD Countries
 oecd <- read.csv("OECD.csv")
 #OPEC Countries
@@ -217,7 +214,7 @@ master <- left_join(master, opec)
 
 Make the same plot as in Problem 3.1, but this time use color to annotate the OECD countries and OPEC countries. For countries that are not part of these two organization annotate if they are from Africa, Asia, or the Americas.
 
-```{r}
+```{r Problem3.3, warning=FALSE}
 # Consolidate groups or continents into a singe variable called "memberOf"
 master$memberOf <- master$continent
 master$memberOf[master$opec == "opec"] <- "OPEC"
@@ -238,7 +235,7 @@ When we graph the data explicitly identifying the OECD and OPEC countries, we ca
 
 Explore how this figure changes across time. Show us 4 figures that demonstrate how this figure changes through time.
 
-```{r}
+```{r Problem3.4, warning=FALSE}
 # Life Expectancy and Fertility Rates 1972
 p <- ggplot(filter(master, year == 1972, continent != "Oceania"), aes(x=fertility, y = life_exp))
 p + geom_point(aes(size = pop, color=memberOf)) +
@@ -280,14 +277,13 @@ Over the time period from 1962-2012, the general trent of the data begins to tak
 
 Make an animation with the `gganimate` package.
 
-```{r}
-# Your code goes here.
+```{r Problem3.5, results ="hide", warning=FALSE, eval=FALSE}
 library(gganimate)
 p <- ggplot(filter(master,  continent != "Oceania", year >=1950), aes(x=fertility, y = life_exp, frame = year))
 p <- p + geom_point(aes(size = pop, color=memberOf)) +
   ggtitle("Life Expectancy and Fertility Rates") +
   labs(x="Fertility Rate", y = "Life Expectancy at Birth", legend.title = "Country Membership")
-gg_animate(p)
+gg_animate(p) 
 ```
 
 
@@ -304,7 +300,7 @@ master %>%
     ggplot(aes(x = year, y = fertility, color = country)) + 
     geom_line() +
     ggtitle("Fertility Rates Over Time") +
-    labs(x="Year", y = "Fertility Rate")  
+    labs(x="Year", y = "Fertility Rate", color = "Country")  
     
 #Plot of France and Tunisia Life Expectancy over Time
 master %>% 
@@ -312,7 +308,7 @@ master %>%
     ggplot(aes(x = year, y = life_exp, color = country)) + 
     geom_line() +
     ggtitle("Life Expectancy Over Time") +
-    labs(x="Year", y = "Life Expectancy")  
+    labs(x="Year", y = "Life Expectancy", color = "Country")  
 
 ```
 
@@ -357,6 +353,9 @@ master %>%
     labs(x="Year", y = "Life Expectancy", color = "Country")  
 ```
 
+When we compare Vietnam to the OECD countries, we see that for most of history (dating back at least to 1800), Vietnam's fertility rate was not dissimilar from many of the OECD coutries. Based on the two fertility graphs, we can see that Vietnam's fertility rate falls later than most of the OECD countires, though not all OECD countries. That is to say that while it is one of the last countries to see its fertility rate drop, it is not an outlier based on the data from the other OECD countries.
+
+The same can be said of life expectancy estimates in Vietnam compared to the OECD countries. The life expectancy in Vietnam is near the bottom of the pack with respect to life expectancy over time, though it over-performs some OECD countries for most of the time period (1800-2015).
 
 # Problem 5
 
@@ -366,7 +365,7 @@ We are now going to examine GDP per capita per day.
 
 Create a smooth density estimate of the distribution of GDP per capita per day across countries in 1970. Include OECD, OPEC, Asia, Africa, and the Americas in the computation. When doing this we want to weigh countries with larger populations more. We can do this using the "weight"" argument in `geom_density`. 
 
-```{r,warning=FALSE}
+```{r Problem5.1,warning=FALSE}
 # Create GDP per capita per day data
 master <- 
   master %>%
@@ -382,6 +381,8 @@ master %>%
   
 
 ```
+
+We can see in this graphic that a large portion of the world population has a very GDP per Capita per Day. There are then two other humps further along the distribution representing wealthier clusters.
 
 ## Problem 5.2
 
@@ -400,21 +401,58 @@ master %>%
 
 ```
 
+We can see from this graphic that the bulk of the low GDP per Capita per Day population is located in Asia, likely driven by the large populations and extreme poverty in countries like India and China.  There is also a spike near zero in Africa. We see that the two other clusters were driven by a bi-modal distribution of GDP per capita in the OECD.
 
 ## Problem 5.3
 
 Visualize these densities for several years. Show a couple of of them. Summarize how the distribution has changed through the years.
 
 ```{r,warning=FALSE}
-# Put your code here.
-# GDP per Capita per Day for Member Groups
-years <- seq(1965, 2005, by = 10)
-p <- master %>%
-  filter(year >= 1950, continent != "Oceania") %>%
-  ggplot(aes(x = GDPperCapitaPerDay, weight = pop, frame = year)) +
+
+# GDP per Capita per Day for Member Groups (1970)
+master %>%
+  filter(year == 1970, continent != "Oceania") %>%
+  ggplot(aes(x = GDPperCapitaPerDay, weight = pop, color = memberOf)) +
   geom_density() +
-  facet_grid(~year) +
+  facet_grid(~ memberOf) +
   ggtitle("GDP per Capita per Day in 1970 (Density)") +
-  labs(x = "GDP per Capita per Day ($)", y = "Population Weighted Density")
-gg_animate(p)
+  labs(x = "GDP per Capita per Day ($)", y = "Population Weighted Density", color = "Country Membership")
+
+# GDP per Capita per Day for Member Groups (1980)
+master %>%
+  filter(year == 1980, continent != "Oceania") %>%
+  ggplot(aes(x = GDPperCapitaPerDay, weight = pop, color = memberOf)) +
+  geom_density() +
+  facet_grid(~ memberOf) +
+  ggtitle("GDP per Capita per Day in 1980 (Density)") +
+  labs(x = "GDP per Capita per Day ($)", y = "Population Weighted Density", color = "Country Membership")
+
+# GDP per Capita per Day for Member Groups (1990)
+master %>%
+  filter(year == 1990, continent != "Oceania") %>%
+  ggplot(aes(x = GDPperCapitaPerDay, weight = pop, color = memberOf)) +
+  geom_density() +
+  facet_grid(~ memberOf) +
+  ggtitle("GDP per Capita per Day in 1990 (Density)") +
+  labs(x = "GDP per Capita per Day ($)", y = "Population Weighted Density", color = "Country Membership")
+
+# GDP per Capita per Day for Member Groups (2000)
+master %>%
+  filter(year == 2000, continent != "Oceania") %>%
+  ggplot(aes(x = GDPperCapitaPerDay, weight = pop, color = memberOf)) +
+  geom_density() +
+  facet_grid(~ memberOf) +
+  ggtitle("GDP per Capita per Day in 2000 (Density)") +
+  labs(x = "GDP per Capita per Day ($)", y = "Population Weighted Density", color = "Country Membership")
+
+# GDP per Capita per Day for Member Groups (2010)
+master %>%
+  filter(year == 2010, continent != "Oceania") %>%
+  ggplot(aes(x = GDPperCapitaPerDay, weight = pop, color = memberOf)) +
+  geom_density() +
+  facet_grid(~ memberOf) +
+  ggtitle("GDP per Capita per Day in 2010 (Density)") +
+  labs(x = "GDP per Capita per Day ($)", y = "Population Weighted Density", color = "Country Membership")
+
 ```
+We can see from the graphs that the wealth in the OECD countries as increased, but has too wealth in Asia. Although the region certaily represents the bulk of the low income population, we can see that the distribution has widened, indicating that some people in those countries have been made better off over the last 50 years. We see a widening of distributions across all regions indicating a similar pattern.  
